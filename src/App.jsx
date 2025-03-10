@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import About from './components/About';
-import Card from './components/Card';
-import Wrapper from './components/Wrapper';
-import ProfileForm from './components/ProfileForm';
+import Home from './pages/Home';
+import AddProfile from './pages/AddProfile';
+import About from './pages/About';
+import NotFound from './pages/NotFound';
 import headshot1 from './assets/headshot1.png'; 
 import headshot2 from './assets/headshot2.png';
 import headshot3 from './assets/headshot3.png';
@@ -16,48 +17,19 @@ import './index.css';
 
 const App = () => {
   const [theme, setTheme] = useState('light');
+
+  // Initial static profiles
   const initialProfiles = [
-    {
-      name: 'Isabelle',
-      role: 'Web Developer',
-      image: headshot1,
-    },
-    {
-      name: 'Tom Nook',
-      role: 'UI/UX Designer',
-      image: headshot2,
-    },
-    {
-      name: 'KK Slider',
-      role: 'Sound Designer',
-      image: headshot3,
-    },
-    {
-      name: 'Celeste',
-      role: 'Animation and VFX',
-      image: headshot4,
-    },
-    {
-      name: 'Mabel',
-      role: 'Animation and VFX',
-      image: headshot5,
-    },
-    {
-      name: 'Rover',
-      role: 'Web Developer',
-      image: headshot6,
-    },
-    {
-      name: 'Harriet',
-      role: 'UI/UX Designer',
-      image: headshot7,
-    },
-    {
-      name: 'Kappn',
-      role: 'Illustrator',
-      image: headshot8,
-    },
+    { name: 'Isabelle', role: 'Web Developer', image: headshot1 },
+    { name: 'Tom Nook', role: 'UI/UX Designer', image: headshot2 },
+    { name: 'KK Slider', role: 'Sound Designer', image: headshot3 },
+    { name: 'Celeste', role: 'Animation and VFX', image: headshot4 },
+    { name: 'Mabel', role: 'Animation and VFX', image: headshot5 },
+    { name: 'Rover', role: 'Web Developer', image: headshot6 },
+    { name: 'Harriet', role: 'UI/UX Designer', image: headshot7 },
+    { name: 'Kappn', role: 'Illustrator', image: headshot8 },
   ];
+
   const [profiles, setProfiles] = useState(initialProfiles);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
@@ -67,12 +39,11 @@ const App = () => {
       try {
         const response = await fetch('http://localhost:5001/api/profiles');
         const profilesData = await response.json();
-        setProfiles([...initialProfiles, ...profilesData]);
+        setProfiles([...initialProfiles, ...profilesData]); // Combine API data with initial ones
       } catch (error) {
         console.error('Error fetching profiles:', error);
       }
     };
-  
     fetchProfiles();
   }, []);
 
@@ -84,71 +55,29 @@ const App = () => {
     setProfiles([...profiles, profile]);
   };
 
-  const filteredCards = profiles.filter(card => {
-    const matchesSearch = card.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = selectedRole ? card.role === selectedRole : true;
-    return matchesSearch && matchesRole;
-  });
-
-  const handleReset = () => {
-    setSearchTerm('');
-    setSelectedRole('');
-  };
-
   return (
     <div className={`app ${theme}`}>
       <header>
         <Navbar theme={theme} toggleTheme={toggleTheme} />
       </header>
       <main>
-        <div id="home" className="section">
-          <div className="container">
-            <h1 className="profile-title">Profile App</h1>
-          </div>
-        </div>
-        <div id="about" className="section">
-          <div className="container">
-            <About />
-          </div>
-        </div>
-        <div id="profiles" className="section">
-          <div className="container">
-            <div className="filter-container">
-              <input 
-                type="text" 
-                placeholder="Search by name..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)} 
+        <Routes>
+          <Route 
+            path="/" 
+            element={
+              <Home 
+                profiles={profiles} 
+                searchTerm={searchTerm} 
+                setSearchTerm={setSearchTerm} 
+                selectedRole={selectedRole} 
+                setSelectedRole={setSelectedRole} 
               />
-              <select 
-                value={selectedRole} 
-                onChange={(e) => setSelectedRole(e.target.value)} 
-              >
-                <option value="">Filter by role</option>
-                <option value="Web Developer">Web Developer</option>
-                <option value="UI/UX Designer">UI/UX Designer</option>
-                <option value="Sound Designer">Sound Designer</option>
-                <option value="Animation and VFX">Animation and VFX</option>
-                <option value="Illustrator">Illustrator</option>
-              </select>
-              <button onClick={handleReset}>Reset</button>
-            </div>
-
-            <Wrapper>
-              {filteredCards.map((card, index) => (
-                <Card 
-                  key={index} 
-                  name={card.name} 
-                  role={card.role} 
-                  image={card.image} 
-                  title={card.title} 
-                  bio={card.bio} 
-                />
-              ))}
-            </Wrapper>
-            <ProfileForm addProfile={addProfile} />
-          </div>
-        </div>
+            } 
+          />
+          <Route path="/add-profile" element={<AddProfile addProfile={addProfile} theme={theme} />} />
+          <Route path="/about" element={<About />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </main>
     </div>
   );

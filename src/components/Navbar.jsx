@@ -1,17 +1,18 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Navbar = ({ theme, toggleTheme }) => {
   return (
     <nav className="navbar">
       <ul>
         <li>
-          <a href="#home">Home</a>
+          <Link to="/">Home</Link>
         </li>
         <li>
-          <a href="#about">About</a>
+          <Link to="/about">About</Link>
         </li>
         <li>
-          <a href="#profiles">Profiles</a>
+          <Link to="/add-profile">Add Profiles</Link>
         </li>
         <li style={{ marginLeft: 'auto' }}>
           <button onClick={toggleTheme}>
